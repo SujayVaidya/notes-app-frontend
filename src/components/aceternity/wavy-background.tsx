@@ -24,7 +24,6 @@ export function WavyBackground({
   speed?: 'slow' | 'fast'
   waveOpacity?: number
 } & React.HTMLProps<HTMLDivElement>) {
-  const noise = useRef<{ simplex2: (x: number, y: number) => number } | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationId = useRef<number>(0)
 

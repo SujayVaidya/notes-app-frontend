@@ -44,7 +44,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <NotepadText className="h-10 w-10 text-white" strokeWidth={1.5} />
             <h1 className={cn('text-5xl md:text-6xl font-bold text-white tracking-tight')}>
-              NoteTaking
+              JayNotes
             </h1>
           </div>
           <p className="text-zinc-400 text-lg mt-1">
@@ -88,7 +88,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="absolute bottom-5 text-zinc-600 text-xs z-20">
-        © 2025 NoteTaking · Built with care
+        © 2025 JayNotes · Built with care
       </footer>
     </div>
   )

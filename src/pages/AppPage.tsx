@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import { useCategories } from '@/hooks/useCategories'
 import { useUIStore } from '@/stores/uiStore'

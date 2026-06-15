@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState, useEffect, useCallback } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -66,7 +66,7 @@ const CollisionMechanism = React.forwardRef<
       repeatDelay?: number
     }
   }
->(({ parentRef, containerRef, beamOptions = {} }, ref) => {
+>(({ parentRef, containerRef, beamOptions = {} }, _ref) => {
   const beamRef = useRef<HTMLDivElement>(null)
   const [collision, setCollision] = useState<{ detected: boolean; coordinates: { x: number; y: number } | null }>({
     detected: false,

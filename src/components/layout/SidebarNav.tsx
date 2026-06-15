@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Plus, Search, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { CreateCategoryDialog } from '@/components/categories/CreateCategoryDialog'
@@ -45,7 +44,7 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
         <div className="border-b border-zinc-800 px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="text-purple-500 text-lg">⬡</span>
-            <span className="font-semibold text-zinc-100">Notes</span>
+            <span className="font-semibold text-zinc-100">JayNotes</span>
           </div>
         </div>
 

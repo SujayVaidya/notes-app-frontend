@@ -50,7 +50,7 @@ export function AppSidebar() {
           <div className="flex items-center justify-between px-4 py-3 group-data-[collapsible=icon]:hidden">
             <div className="flex items-center gap-2">
               <span className="text-purple-500 text-lg">⬡</span>
-              <span className="font-semibold text-zinc-100">Notes</span>
+              <span className="font-semibold text-zinc-100">JayNotes</span>
             </div>
             <SidebarTrigger className="text-zinc-400 hover:text-zinc-100" />
           </div>
@@ -58,7 +58,7 @@ export function AppSidebar() {
           <div className="hidden group-data-[collapsible=icon]:flex flex-col items-center gap-2 py-4 w-full">
             <span className="text-purple-500 text-xl leading-none">⬡</span>
             <span className="text-[9px] font-bold text-zinc-500 tracking-[0.2em] uppercase select-none">
-              Notes
+              Jay
             </span>
             <SidebarTrigger className="mt-1 text-zinc-400 hover:text-zinc-100" />
           </div>

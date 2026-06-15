@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Copy, Maximize2, Trash2, ChevronLeft, FolderInput } from 'lucide-react'
 import { toast } from 'sonner'
 import {
