@@ -71,6 +71,7 @@ export function NoteToolbar({ note, saveStatus }: Props) {
     { id: 1, name: 'Copy content', icon: <Copy className="h-4 w-4" />, onClick: handleCopy },
     { id: 2, name: 'Focus mode', icon: <Maximize2 className="h-4 w-4" />, onClick: toggleFocusMode },
   ]
+  console.log('rendering toolbar', note.noteType)
 
   return (
     <>
@@ -89,10 +90,10 @@ export function NoteToolbar({ note, saveStatus }: Props) {
           disabled
           className="border border-zinc-800 rounded-md p-0.5 opacity-60 cursor-not-allowed"
         >
-          <ToggleGroupItem value="text" className="h-6 px-2.5 text-xs data-[state=on]:bg-zinc-700 disabled:pointer-events-none">
+          <ToggleGroupItem value="text" className={`h-6 px-2.5 text-xs disabled:pointer-events-none transition-colors ${note.noteType === 'text' ? 'bg-purple-600/20 border border-purple-600 text-purple-300' : 'data-[state=on]:bg-zinc-700'}`}>
             Text
           </ToggleGroupItem>
-          <ToggleGroupItem value="markdown" className="h-6 px-2.5 text-xs data-[state=on]:bg-zinc-700 disabled:pointer-events-none">
+          <ToggleGroupItem value="markdown" className={`h-6 px-2.5 text-xs disabled:pointer-events-none transition-colors ${note.noteType === 'markdown' ? 'bg-purple-600/20 border border-purple-600 text-purple-300' : 'data-[state=on]:bg-zinc-700'}`}>
             Markdown
           </ToggleGroupItem>
         </ToggleGroup>

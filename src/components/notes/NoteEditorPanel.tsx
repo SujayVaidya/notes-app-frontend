@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { FileText } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { ShootingStars } from '@/components/aceternity/shooting-stars'
+import { StarsBackground } from '@/components/aceternity/stars-background'
 import { TitleInput } from './TitleInput'
 import { PlainTextEditor } from './PlainTextEditor'
 import { MarkdownEditor } from './MarkdownEditor'
@@ -24,11 +26,14 @@ export function NoteEditorPanel() {
 
   if (!activeNoteId) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-zinc-950">
+      <div className="flex-1 flex items-center justify-center bg-zinc-950 relative overflow-hidden">
+        <StarsBackground />
+        <ShootingStars />
         <EmptyState
           icon={<FileText className="h-10 w-10" />}
           title="No note selected"
           description="Select a note from the list or create a new one"
+          className="relative z-10"
         />
       </div>
     )

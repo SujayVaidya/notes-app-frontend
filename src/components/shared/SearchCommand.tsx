@@ -57,7 +57,7 @@ export function SearchCommand() {
   }
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
       <CommandInput
         placeholder="Search notes..."
         value={inputValue}

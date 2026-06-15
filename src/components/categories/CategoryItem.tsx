@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Hash, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Hash, Pencil, Trash2, ChevronRight, FileText } from 'lucide-react'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -18,33 +19,50 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import {
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from '@/components/ui/sidebar'
 import { useDeleteCategory, useUpdateCategory } from '@/hooks/useCategories'
 import { useUIStore } from '@/stores/uiStore'
 import type { Category } from '@/types/category'
+import type { Note } from '@/types/note'
 import { cn } from '@/lib/utils'
 
 interface Props {
   category: Category
-  noteCount?: number
+  notes?: Note[]
   onNavigate?: () => void
 }
 
-export function CategoryItem({ category, noteCount, onNavigate }: Props) {
+export function CategoryItem({ category, notes = [], onNavigate }: Props) {
   const activeCategoryId = useUIStore((s) => s.activeCategoryId)
   const setActiveCategory = useUIStore((s) => s.setActiveCategory)
+  const activeNoteId = useUIStore((s) => s.activeNoteId)
   const setActiveNote = useUIStore((s) => s.setActiveNote)
   const deleteCategory = useDeleteCategory()
   const updateCategory = useUpdateCategory()
+  const navigate = useNavigate()
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState(category.name)
+  const [expanded, setExpanded] = useState(false)
 
   const isActive = activeCategoryId === category._id
 
-  function handleClick() {
+  function handleCategoryClick() {
     setActiveCategory(category._id)
     setActiveNote(null)
+    setExpanded((v) => !v)
+    onNavigate?.()
+  }
+
+  function handleNoteClick(note: Note) {
+    setActiveNote(note._id)
+    navigate(`/app/notes/${note._id}`)
     onNavigate?.()
   }
 
@@ -60,38 +78,81 @@ export function CategoryItem({ category, noteCount, onNavigate }: Props) {
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
-          <button
-            onClick={handleClick}
-            className={cn(
-              'w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors text-left group',
-              isActive
-                ? 'bg-purple-600/20 text-purple-300 border border-purple-600/30'
-                : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50'
-            )}
-          >
-            <Hash className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'text-purple-400' : 'text-zinc-500')} />
-            {editing ? (
-              <Input
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onBlur={handleRename}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleRename()
-                  if (e.key === 'Escape') setEditing(false)
-                }}
-                autoFocus
-                className="h-5 py-0 px-1 text-sm bg-transparent border-zinc-600"
-                onClick={(e) => e.stopPropagation()}
+          <div>
+            {/* Category row */}
+            <SidebarMenuButton
+              onClick={handleCategoryClick}
+              className={cn(
+                'w-full gap-2 min-w-0',
+                isActive
+                  ? 'bg-purple-600/20 text-purple-300'
+                  : 'text-zinc-400 hover:text-zinc-100'
+              )}
+            >
+              <Hash className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'text-purple-400' : 'text-zinc-500')} />
+              {editing ? (
+                <Input
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={handleRename}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleRename()
+                    if (e.key === 'Escape') setEditing(false)
+                  }}
+                  autoFocus
+                  className="h-5 py-0 px-1 text-sm bg-transparent border-zinc-600 flex-1"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <span className="flex-1 truncate">{category.name}</span>
+              )}
+              {notes.length > 0 && (
+                <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4 bg-zinc-800 text-zinc-500 shrink-0">
+                  {notes.length}
+                </Badge>
+              )}
+              <ChevronRight
+                className={cn('h-3.5 w-3.5 shrink-0 text-zinc-600 transition-transform duration-200', expanded ? 'rotate-90' : '')}
               />
-            ) : (
-              <span className="flex-1 truncate">{category.name}</span>
+            </SidebarMenuButton>
+
+            {/* Notes accordion */}
+            {expanded && (
+              <SidebarMenuSub>
+                {notes.length === 0 ? (
+                  <div className="px-2 py-1.5 text-xs text-zinc-600 italic">No notes</div>
+                ) : (
+                  notes.map((note) => (
+                    <SidebarMenuSubItem key={note._id}>
+                      <SidebarMenuSubButton
+                        onClick={() => handleNoteClick(note)}
+                        className={cn(
+                          'gap-2',
+                          activeNoteId === note._id
+                            ? 'bg-purple-600/10 text-purple-300'
+                            : 'text-zinc-400 hover:text-zinc-100'
+                        )}
+                      >
+                        <FileText className="h-3 w-3 shrink-0 text-zinc-600" />
+                        <span className="flex-1 truncate text-xs">{note.title || 'Untitled'}</span>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'text-[9px] px-1 py-0 h-3.5 shrink-0',
+                            note.noteType === 'markdown'
+                              ? 'text-purple-400 border-purple-800'
+                              : 'text-zinc-500 border-zinc-700'
+                          )}
+                        >
+                          {note.noteType}
+                        </Badge>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  ))
+                )}
+              </SidebarMenuSub>
             )}
-            {noteCount !== undefined && noteCount > 0 && (
-              <Badge variant="secondary" className="text-xs px-1.5 py-0 h-4 bg-zinc-800 text-zinc-500">
-                {noteCount}
-              </Badge>
-            )}
-          </button>
+          </div>
         </ContextMenuTrigger>
         <ContextMenuContent className="bg-zinc-900 border-zinc-800">
           <ContextMenuItem

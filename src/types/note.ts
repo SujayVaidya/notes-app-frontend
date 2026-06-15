@@ -14,9 +14,10 @@ export interface Note {
 
 export interface CreateNoteInput {
   title: string
-  markdownContent: string
   categoryId: string
   noteType: NoteType
+  plainTextContent?: string
+  markdownContent?: string
 }
 
 export interface UpdateNoteInput {

@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Plus, Search, LogOut, ChevronRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Plus, Search, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { CategoryItem } from '@/components/categories/CategoryItem'
 import { CreateCategoryDialog } from '@/components/categories/CreateCategoryDialog'
+import { CategoryItem } from '@/components/categories/CategoryItem'
 import { useCategories } from '@/hooks/useCategories'
 import { useNotes } from '@/hooks/useNotes'
 import { useSignOut } from '@/hooks/useAuth'
@@ -15,21 +16,18 @@ interface SidebarNavProps {
 
 export function SidebarNav({ onNavigate }: SidebarNavProps) {
   const { data: categories } = useCategories()
+  const { data: allNotes } = useNotes()
   const setSearchOpen = useUIStore((s) => s.setSearchOpen)
   const setCreateNoteOpen = useUIStore((s) => s.setCreateNoteOpen)
-  const activeCategoryId = useUIStore((s) => s.activeCategoryId)
-  const setActiveCategory = useUIStore((s) => s.setActiveCategory)
-  const setActiveNote = useUIStore((s) => s.setActiveNote)
   const user = useAuthStore((s) => s.user)
   const signOut = useSignOut()
   const [createCatOpen, setCreateCatOpen] = useState(false)
-  const { data: allNotes } = useNotes()
-
-  function getNotesCount(categoryId: string) {
-    return allNotes?.filter((n) => n.categoryId === categoryId).length ?? 0
-  }
 
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? 'U'
+
+  function getNotesForCategory(categoryId: string) {
+    return allNotes?.filter((n) => n.categoryId === categoryId) ?? []
+  }
 
   function handleSearch() {
     setSearchOpen(true)
@@ -38,12 +36,6 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
 
   function handleNewNote() {
     setCreateNoteOpen(true)
-    onNavigate?.()
-  }
-
-  function handleSelectAll() {
-    setActiveCategory(null)
-    setActiveNote(null)
     onNavigate?.()
   }
 
@@ -86,23 +78,13 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
               <Plus className="h-3.5 w-3.5" />
             </button>
           </div>
+
           <div className="px-2 space-y-0.5">
-            <button
-              onClick={handleSelectAll}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
-                activeCategoryId === null
-                  ? 'bg-purple-600/20 text-purple-300 border border-purple-600/30'
-                  : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50'
-              }`}
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-              All Notes
-            </button>
             {categories?.map((cat) => (
               <CategoryItem
                 key={cat._id}
                 category={cat}
-                noteCount={getNotesCount(cat._id)}
+                notes={getNotesForCategory(cat._id)}
                 onNavigate={onNavigate}
               />
             ))}

@@ -55,8 +55,14 @@ export function CreateNoteDialog({ open, onOpenChange }: Props) {
   })
 
   function onSubmit(data: FormData) {
+    const noteType = data.noteType as NoteType
     createNote.mutate(
-      { title: data.title, markdownContent: '', categoryId: data.categoryId, noteType: data.noteType as NoteType },
+      {
+        title: data.title,
+        categoryId: data.categoryId,
+        noteType,
+        ...(noteType === 'text' ? { plainTextContent: '' } : { markdownContent: '' }),
+      },
       {
         onSuccess: () => {
           reset()
@@ -120,14 +126,14 @@ export function CreateNoteDialog({ open, onOpenChange }: Props) {
                   onValueChange={field.onChange}
                   className="grid grid-cols-2 gap-3"
                 >
-                  <label className="flex items-start gap-3 p-3 rounded-md border border-zinc-700 cursor-pointer hover:border-zinc-600 transition-colors">
+                  <label className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors ${field.value === "text" ? "border-purple-600 bg-purple-600/10" : "border-zinc-700 hover:border-zinc-600"}`}>
                     <RadioGroupItem value="text" id="type-text" className="mt-0.5" />
                     <div>
                       <div className="text-sm font-medium">Plain Text</div>
                       <div className="text-xs text-zinc-500">Simple, distraction-free writing</div>
                     </div>
                   </label>
-                  <label className="flex items-start gap-3 p-3 rounded-md border border-zinc-700 cursor-pointer hover:border-zinc-600 transition-colors">
+                  <label className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-colors ${field.value === "markdown" ? "border-purple-600 bg-purple-600/10" : "border-zinc-700 hover:border-zinc-600"}`}>
                     <RadioGroupItem value="markdown" id="type-md" className="mt-0.5" />
                     <div>
                       <div className="text-sm font-medium">Markdown</div>

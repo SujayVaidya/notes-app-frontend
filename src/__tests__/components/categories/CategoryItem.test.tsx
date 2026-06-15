@@ -27,27 +27,31 @@ describe('CategoryItem', () => {
     expect(screen.getByText('General')).toBeInTheDocument()
   })
 
-  it('renders note count badge when noteCount is provided', () => {
-    renderWithProviders(<CategoryItem category={defaultCat} noteCount={5} />)
-    expect(screen.getByText('5')).toBeInTheDocument()
+  it('renders note count badge when notes are provided', () => {
+    const mockNotes = [
+      { _id: 'n1', title: 'Note 1', noteType: 'text', categoryId: 'cat-1', markdownContent: '', plainTextContent: '', updatedAt: new Date().toISOString(), createdAt: new Date().toISOString() },
+      { _id: 'n2', title: 'Note 2', noteType: 'text', categoryId: 'cat-1', markdownContent: '', plainTextContent: '', updatedAt: new Date().toISOString(), createdAt: new Date().toISOString() },
+    ] as any[]
+    renderWithProviders(<CategoryItem category={defaultCat} notes={mockNotes} />)
+    expect(screen.getByText('2')).toBeInTheDocument()
   })
 
   it('sets active category on click', async () => {
     renderWithProviders(<CategoryItem category={customCat} />)
-    await userEvent.click(screen.getByRole('button'))
+    await userEvent.click(screen.getByRole('button', { name: /work/i }))
     expect(useUIStore.getState().activeCategoryId).toBe('cat-2')
   })
 
   it('applies active styling when category is active', () => {
     useUIStore.setState({ activeCategoryId: 'cat-2' })
     renderWithProviders(<CategoryItem category={customCat} />)
-    const btn = screen.getByRole('button')
+    const btn = screen.getByRole('button', { name: /work/i })
     expect(btn.className).toContain('purple')
   })
 
   it('shows delete option for non-default categories (right-click)', async () => {
     renderWithProviders(<CategoryItem category={customCat} />)
-    await userEvent.pointer({ target: screen.getByRole('button'), keys: '[MouseRight]' })
+    await userEvent.pointer({ target: screen.getByRole('button', { name: /work/i }), keys: '[MouseRight]' })
     await waitFor(() => {
       expect(screen.getByText(/delete/i)).toBeInTheDocument()
     })
@@ -55,7 +59,7 @@ describe('CategoryItem', () => {
 
   it('hides delete option for the default General category', async () => {
     renderWithProviders(<CategoryItem category={defaultCat} />)
-    await userEvent.pointer({ target: screen.getByRole('button'), keys: '[MouseRight]' })
+    await userEvent.pointer({ target: screen.getByRole('button', { name: /general/i }), keys: '[MouseRight]' })
     await waitFor(() => {
       expect(screen.getByText(/rename/i)).toBeInTheDocument()
     })
