@@ -24,7 +24,7 @@ export function PlainTextEditor({ noteId, initialContent, onSaveStart, onSaveEnd
       clearTimeout(debounceRef.current)
       onSaveStart?.()
       debounceRef.current = setTimeout(() => {
-        updateNote.mutate({ markdownContent: newVal }, { onSettled: () => onSaveEnd?.() })
+        updateNote.mutate({ plainTextContent: newVal }, { onSettled: () => onSaveEnd?.() })
       }, 800)
     },
     [updateNote, onSaveStart, onSaveEnd]

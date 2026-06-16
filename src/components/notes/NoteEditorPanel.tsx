@@ -83,7 +83,7 @@ export function NoteEditorPanel() {
           ) : (
             <PlainTextEditor
               noteId={note._id}
-              initialContent={note.markdownContent ?? ''}
+              initialContent={note.plainTextContent ?? ''}
               onSaveStart={saveTimeout}
               onSaveEnd={saveDone}
             />

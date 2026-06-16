@@ -23,5 +23,6 @@ export interface CreateNoteInput {
 export interface UpdateNoteInput {
   title?: string
   markdownContent?: string
+  plainTextContent?: string
   noteType?: NoteType
 }
