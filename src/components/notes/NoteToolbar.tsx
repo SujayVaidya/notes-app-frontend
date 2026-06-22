@@ -31,7 +31,7 @@ import { cn } from '@/lib/utils'
 
 interface Props {
   note: Note
-  saveStatus: 'idle' | 'saving' | 'saved'
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error'
 }
 
 export function NoteToolbar({ note, saveStatus }: Props) {
@@ -71,11 +71,9 @@ export function NoteToolbar({ note, saveStatus }: Props) {
     { id: 1, name: 'Copy content', icon: <Copy className="h-4 w-4" />, onClick: handleCopy },
     { id: 2, name: 'Focus mode', icon: <Maximize2 className="h-4 w-4" />, onClick: toggleFocusMode },
   ]
-  console.log('rendering toolbar', note.noteType)
-
   return (
     <>
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800 bg-zinc-950/50">
+      <div className="flex items-center gap-2 px-4 py-2 md:ml-6 border-b border-zinc-800 bg-zinc-950/50">
         <button
           onClick={() => setActiveNote(null)}
           className="md:hidden p-1.5 rounded-md hover:bg-zinc-800 text-zinc-400"
@@ -106,7 +104,7 @@ export function NoteToolbar({ note, saveStatus }: Props) {
               className="h-7 gap-1.5 text-xs text-zinc-400 hover:text-zinc-100"
             >
               <FolderInput className="h-3.5 w-3.5" />
-              <span className="max-w-[80px] truncate">{currentCategory?.name ?? 'Move'}</span>
+              <span className="max-w-20 truncate">{currentCategory?.name ?? 'Move'}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-48 p-0 bg-zinc-900 border-zinc-800">
@@ -146,10 +144,13 @@ export function NoteToolbar({ note, saveStatus }: Props) {
             'text-xs transition-opacity',
             saveStatus === 'saving' ? 'text-zinc-500 opacity-100' : '',
             saveStatus === 'saved' ? 'text-green-500 opacity-100' : '',
+            saveStatus === 'error' ? 'text-red-400 opacity-100' : '',
             saveStatus === 'idle' ? 'opacity-0' : ''
           )}
         >
-          {saveStatus === 'saving' ? 'Saving...' : 'Saved'}
+          {saveStatus === 'saving' && 'Saving...'}
+          {saveStatus === 'saved' && 'Saved'}
+          {saveStatus === 'error' && 'Save failed — backed up locally'}
         </span>
 
         <button

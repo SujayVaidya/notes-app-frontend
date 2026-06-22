@@ -13,7 +13,7 @@ export function MobileTopBar() {
   const category = categories?.find((c) => c._id === activeCategoryId)
 
   return (
-    <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950">
+    <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950">
       <button
         onClick={() => setOpen(true)}
         className="p-1.5 rounded-md hover:bg-zinc-800 text-zinc-400"
@@ -22,7 +22,7 @@ export function MobileTopBar() {
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="p-0 w-[260px] bg-zinc-950 border-zinc-800">
+        <SheetContent side="left" className="p-0 w-65 bg-zinc-950 border-zinc-800">
           <SidebarNav onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>

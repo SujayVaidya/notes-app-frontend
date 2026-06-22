@@ -57,7 +57,6 @@ export function CategoryItem({ category, notes = [], onNavigate }: Props) {
     setActiveCategory(category._id)
     setActiveNote(null)
     setExpanded((v) => !v)
-    onNavigate?.()
   }
 
   function handleNoteClick(note: Note) {

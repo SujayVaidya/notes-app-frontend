@@ -6,9 +6,12 @@ interface Props {
   initialContent: string
   onSaveStart?: () => void
   onSaveEnd?: () => void
+  onSaveError?: () => void
 }
 
-export function MarkdownEditor({ noteId, initialContent, onSaveStart, onSaveEnd }: Props) {
+export const mdDraftKey = (id: string) => `draft_md_${id}`
+
+export function MarkdownEditor({ noteId, initialContent, onSaveStart, onSaveEnd, onSaveError }: Props) {
   const [value, setValue] = useState(initialContent)
   const updateNote = useUpdateNote(noteId)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -28,13 +31,25 @@ export function MarkdownEditor({ noteId, initialContent, onSaveStart, onSaveEnd 
     (newVal?: string) => {
       const v = newVal ?? ''
       setValue(v)
+      localStorage.setItem(mdDraftKey(noteId), v)
       clearTimeout(debounceRef.current)
       onSaveStart?.()
       debounceRef.current = setTimeout(() => {
-        updateNote.mutate({ markdownContent: v }, { onSettled: () => onSaveEnd?.() })
+        updateNote.mutate(
+          { markdownContent: v },
+          {
+            onSuccess: () => {
+              localStorage.removeItem(mdDraftKey(noteId))
+              onSaveEnd?.()
+            },
+            onError: () => {
+              onSaveError?.()
+            },
+          }
+        )
       }, 800)
     },
-    [updateNote, onSaveStart, onSaveEnd]
+    [noteId, updateNote, onSaveStart, onSaveEnd, onSaveError]
   )
 
   if (!MDEditor) {

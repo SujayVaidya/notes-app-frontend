@@ -14,12 +14,12 @@ export function AppShell() {
   return (
     <SidebarProvider>
       {!focusMode && (
-        <div className="hidden md:flex h-screen">
+        <div className="hidden lg:contents">
           <AppSidebar />
         </div>
       )}
 
-      <SidebarInset className="flex flex-col min-h-screen bg-zinc-950">
+      <SidebarInset className="flex flex-col min-h-screen bg-zinc-950 min-w-0">
         <MobileTopBar />
         <div className="flex flex-1 min-h-0">
           <NoteEditorPanel />

@@ -6,9 +6,10 @@ interface Props {
   initialTitle: string
   onSaveStart?: () => void
   onSaveEnd?: () => void
+  onSaveError?: () => void
 }
 
-export function TitleInput({ noteId, initialTitle, onSaveStart, onSaveEnd }: Props) {
+export function TitleInput({ noteId, initialTitle, onSaveStart, onSaveEnd, onSaveError }: Props) {
   const [value, setValue] = useState(initialTitle)
   const updateNote = useUpdateNote(noteId)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -24,7 +25,13 @@ export function TitleInput({ noteId, initialTitle, onSaveStart, onSaveEnd }: Pro
       clearTimeout(debounceRef.current)
       onSaveStart?.()
       debounceRef.current = setTimeout(() => {
-        updateNote.mutate({ title: newVal }, { onSettled: () => onSaveEnd?.() })
+        updateNote.mutate(
+          { title: newVal },
+          {
+            onSuccess: () => onSaveEnd?.(),
+            onError: () => onSaveError?.(),
+          }
+        )
       }, 800)
     },
     [updateNote, onSaveStart, onSaveEnd]

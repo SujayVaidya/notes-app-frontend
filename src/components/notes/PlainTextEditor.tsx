@@ -6,9 +6,12 @@ interface Props {
   initialContent: string
   onSaveStart?: () => void
   onSaveEnd?: () => void
+  onSaveError?: () => void
 }
 
-export function PlainTextEditor({ noteId, initialContent, onSaveStart, onSaveEnd }: Props) {
+export const plainDraftKey = (id: string) => `draft_plain_${id}`
+
+export function PlainTextEditor({ noteId, initialContent, onSaveStart, onSaveEnd, onSaveError }: Props) {
   const [value, setValue] = useState(initialContent)
   const updateNote = useUpdateNote(noteId)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -21,13 +24,25 @@ export function PlainTextEditor({ noteId, initialContent, onSaveStart, onSaveEnd
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newVal = e.target.value
       setValue(newVal)
+      localStorage.setItem(plainDraftKey(noteId), newVal)
       clearTimeout(debounceRef.current)
       onSaveStart?.()
       debounceRef.current = setTimeout(() => {
-        updateNote.mutate({ plainTextContent: newVal }, { onSettled: () => onSaveEnd?.() })
+        updateNote.mutate(
+          { plainTextContent: newVal },
+          {
+            onSuccess: () => {
+              localStorage.removeItem(plainDraftKey(noteId))
+              onSaveEnd?.()
+            },
+            onError: () => {
+              onSaveError?.()
+            },
+          }
+        )
       }, 800)
     },
-    [updateNote, onSaveStart, onSaveEnd]
+    [noteId, updateNote, onSaveStart, onSaveEnd, onSaveError]
   )
 
   return (

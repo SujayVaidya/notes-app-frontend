@@ -60,4 +60,51 @@ describe('TitleInput', () => {
     rerender(<TitleInput noteId="note-1" initialTitle="Second" />)
     expect(screen.getByDisplayValue('Second')).toBeInTheDocument()
   })
+
+  describe('onSaveEnd and onSaveError callbacks', () => {
+    it('calls onSaveEnd on successful save', () => {
+      const onSaveEnd = vi.fn()
+      mockMutate.mockImplementation((_payload: unknown, cbs: { onSuccess: () => void }) => cbs.onSuccess())
+      renderWithProviders(
+        <TitleInput noteId="note-1" initialTitle="Old" onSaveEnd={onSaveEnd} />
+      )
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Updated' } })
+      vi.advanceTimersByTime(800)
+      expect(onSaveEnd).toHaveBeenCalled()
+    })
+
+    it('does NOT call onSaveEnd when save fails', () => {
+      const onSaveEnd = vi.fn()
+      const onSaveError = vi.fn()
+      mockMutate.mockImplementation((_payload: unknown, cbs: { onError: () => void }) => cbs.onError())
+      renderWithProviders(
+        <TitleInput noteId="note-1" initialTitle="Old" onSaveEnd={onSaveEnd} onSaveError={onSaveError} />
+      )
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Bad' } })
+      vi.advanceTimersByTime(800)
+      expect(onSaveEnd).not.toHaveBeenCalled()
+    })
+
+    it('calls onSaveError when save fails', () => {
+      const onSaveError = vi.fn()
+      mockMutate.mockImplementation((_payload: unknown, cbs: { onError: () => void }) => cbs.onError())
+      renderWithProviders(
+        <TitleInput noteId="note-1" initialTitle="Old" onSaveError={onSaveError} />
+      )
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Bad' } })
+      vi.advanceTimersByTime(800)
+      expect(onSaveError).toHaveBeenCalled()
+    })
+
+    it('does NOT call onSaveError on successful save', () => {
+      const onSaveError = vi.fn()
+      mockMutate.mockImplementation((_payload: unknown, cbs: { onSuccess: () => void }) => cbs.onSuccess())
+      renderWithProviders(
+        <TitleInput noteId="note-1" initialTitle="Old" onSaveError={onSaveError} />
+      )
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Good' } })
+      vi.advanceTimersByTime(800)
+      expect(onSaveError).not.toHaveBeenCalled()
+    })
+  })
 })

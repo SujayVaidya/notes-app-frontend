@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Plus, Search, LogOut } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
+import { SignOutButton } from '@/components/shared/SignOutButton'
 import { CreateCategoryDialog } from '@/components/categories/CreateCategoryDialog'
 import { CategoryItem } from '@/components/categories/CategoryItem'
 import { useCategories } from '@/hooks/useCategories'
 import { useNotes } from '@/hooks/useNotes'
-import { useSignOut } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/authStore'
 import { useUIStore } from '@/stores/uiStore'
 
@@ -14,12 +15,11 @@ interface SidebarNavProps {
 }
 
 export function SidebarNav({ onNavigate }: SidebarNavProps) {
-  const { data: categories } = useCategories()
-  const { data: allNotes } = useNotes()
+  const { data: categories, isLoading: catsLoading } = useCategories()
+  const { data: allNotes, isLoading: notesLoading } = useNotes()
   const setSearchOpen = useUIStore((s) => s.setSearchOpen)
   const setCreateNoteOpen = useUIStore((s) => s.setCreateNoteOpen)
   const user = useAuthStore((s) => s.user)
-  const signOut = useSignOut()
   const [createCatOpen, setCreateCatOpen] = useState(false)
 
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? 'U'
@@ -79,14 +79,22 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
           </div>
 
           <div className="px-2 space-y-0.5">
-            {categories?.map((cat) => (
-              <CategoryItem
-                key={cat._id}
-                category={cat}
-                notes={getNotesForCategory(cat._id)}
-                onNavigate={onNavigate}
-              />
-            ))}
+            {catsLoading || notesLoading ? (
+              <div className="space-y-1 px-1 py-1">
+                {[0, 1, 2].map((i) => (
+                  <Skeleton key={i} className="h-8 w-full rounded-md bg-zinc-800" />
+                ))}
+              </div>
+            ) : (
+              categories?.map((cat) => (
+                <CategoryItem
+                  key={cat._id}
+                  category={cat}
+                  notes={getNotesForCategory(cat._id)}
+                  onNavigate={onNavigate}
+                />
+              ))
+            )}
           </div>
         </div>
 
@@ -100,13 +108,7 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
             <div className="flex-1 min-w-0">
               <p className="text-xs text-zinc-300 truncate">{user?.email}</p>
             </div>
-            <button
-              onClick={signOut}
-              className="text-zinc-500 hover:text-red-400 transition-colors"
-              title="Sign out"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <SignOutButton />
           </div>
         </div>
       </div>

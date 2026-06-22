@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, LogOut } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -14,21 +14,21 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
+import { SignOutButton } from '@/components/shared/SignOutButton'
 import { CategoryItem } from '@/components/categories/CategoryItem'
 import { CreateCategoryDialog } from '@/components/categories/CreateCategoryDialog'
 import { useCategories } from '@/hooks/useCategories'
 import { useNotes } from '@/hooks/useNotes'
-import { useSignOut } from '@/hooks/useAuth'
 import { useAuthStore } from '@/stores/authStore'
 import { useUIStore } from '@/stores/uiStore'
 
 export function AppSidebar() {
-  const { data: categories } = useCategories()
-  const { data: allNotes } = useNotes()
+  const { data: categories, isLoading: catsLoading } = useCategories()
+  const { data: allNotes, isLoading: notesLoading } = useNotes()
   const setSearchOpen = useUIStore((s) => s.setSearchOpen)
   const setCreateNoteOpen = useUIStore((s) => s.setCreateNoteOpen)
   const user = useAuthStore((s) => s.user)
-  const signOut = useSignOut()
   const [createCatOpen, setCreateCatOpen] = useState(false)
 
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? 'U'
@@ -106,14 +106,22 @@ export function AppSidebar() {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {categories?.map((cat) => (
-                  <SidebarMenuItem key={cat._id}>
-                    <CategoryItem
-                      category={cat}
-                      notes={getNotesForCategory(cat._id)}
-                    />
-                  </SidebarMenuItem>
-                ))}
+                {catsLoading || notesLoading ? (
+                  <div className="space-y-1 px-2 py-1">
+                    {[0, 1, 2].map((i) => (
+                      <Skeleton key={i} className="h-8 w-full rounded-md bg-zinc-800" />
+                    ))}
+                  </div>
+                ) : (
+                  categories?.map((cat) => (
+                    <SidebarMenuItem key={cat._id}>
+                      <CategoryItem
+                        category={cat}
+                        notes={getNotesForCategory(cat._id)}
+                      />
+                    </SidebarMenuItem>
+                  ))
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -128,13 +136,7 @@ export function AppSidebar() {
             <div className="flex-1 min-w-0">
               <p className="text-xs text-zinc-300 truncate">{user?.email}</p>
             </div>
-            <button
-              onClick={signOut}
-              className="text-zinc-500 hover:text-red-400 transition-colors"
-              title="Sign out"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <SignOutButton />
           </div>
           {/* Collapsed */}
           <div className="hidden group-data-[collapsible=icon]:flex justify-center py-3">

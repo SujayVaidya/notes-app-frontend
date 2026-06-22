@@ -16,7 +16,21 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (res) => res.data,
-  (err) => {
+  async (err) => {
+    const config = err.config
+
+    // Retry up to MAX_RETRIES times on network errors or 5xx (covers transient CORS/office-wifi drops)
+    const MAX_RETRIES = 2
+    const isNetworkError = !err.response
+    const isServerError = err.response?.status >= 500
+    const retryCount: number = Number(config?._retryCount) || 0
+
+    if (config && (isNetworkError || isServerError) && retryCount < MAX_RETRIES) {
+      config._retryCount = retryCount + 1
+      await new Promise((r) => setTimeout(r, 300 * config._retryCount))
+      return api(config)
+    }
+
     if (err.response?.status === 401) {
       useAuthStore.getState().setSession(null)
       window.location.href = '/auth'
