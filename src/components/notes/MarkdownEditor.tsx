@@ -16,6 +16,7 @@ export function MarkdownEditor({ noteId, initialContent, onSaveStart, onSaveEnd,
   const updateNote = useUpdateNote(noteId)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [MDEditor, setMDEditor] = useState<typeof import('@uiw/react-md-editor').default | null>(null)
+  const loadedNoteIdRef = useRef(noteId)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -23,9 +24,16 @@ export function MarkdownEditor({ noteId, initialContent, onSaveStart, onSaveEnd,
     }
   }, [])
 
+  // Only resync from the server/draft value when switching notes — not on every
+  // cache update from our own save, which would otherwise overwrite in-progress
+  // typing with the stale snapshot and snap the cursor to the end.
   useEffect(() => {
-    setValue(initialContent)
-  }, [initialContent])
+    if (loadedNoteIdRef.current !== noteId) {
+      loadedNoteIdRef.current = noteId
+      setValue(initialContent)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteId])
 
   const handleChange = useCallback(
     (newVal?: string) => {

@@ -29,9 +29,17 @@ describe('PlainTextEditor', () => {
       expect(screen.getByPlaceholderText('Start writing...')).toBeInTheDocument()
     })
 
-    it('resets displayed value when initialContent prop changes', () => {
+    it('does NOT reset displayed value when initialContent changes for the same note', () => {
+      // Regression guard: a save round-trip updates the query cache and changes
+      // initialContent for the *same* note. That must not clobber in-progress typing.
       const { rerender } = renderWithProviders(<PlainTextEditor noteId="n1" initialContent="First" />)
       rerender(<PlainTextEditor noteId="n1" initialContent="Second" />)
+      expect(screen.getByDisplayValue('First')).toBeInTheDocument()
+    })
+
+    it('resets displayed value when switching to a different note', () => {
+      const { rerender } = renderWithProviders(<PlainTextEditor noteId="n1" initialContent="First" />)
+      rerender(<PlainTextEditor noteId="n2" initialContent="Second" />)
       expect(screen.getByDisplayValue('Second')).toBeInTheDocument()
     })
   })

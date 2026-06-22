@@ -73,7 +73,7 @@ export function NoteToolbar({ note, saveStatus }: Props) {
   ]
   return (
     <>
-      <div className="flex items-center gap-2 px-4 py-2 md:ml-6 border-b border-zinc-800 bg-zinc-950/50">
+      <div className="flex items-center gap-2 px-4 py-2 lg:ml-6 border-b border-zinc-800 bg-zinc-950/50">
         <button
           onClick={() => setActiveNote(null)}
           className="md:hidden p-1.5 rounded-md hover:bg-zinc-800 text-zinc-400"

@@ -15,10 +15,18 @@ export function PlainTextEditor({ noteId, initialContent, onSaveStart, onSaveEnd
   const [value, setValue] = useState(initialContent)
   const updateNote = useUpdateNote(noteId)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const loadedNoteIdRef = useRef(noteId)
 
+  // Only resync from the server/draft value when switching notes — not on every
+  // cache update from our own save, which would otherwise overwrite in-progress
+  // typing with the stale snapshot and snap the cursor to the end.
   useEffect(() => {
-    setValue(initialContent)
-  }, [initialContent])
+    if (loadedNoteIdRef.current !== noteId) {
+      loadedNoteIdRef.current = noteId
+      setValue(initialContent)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteId])
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {

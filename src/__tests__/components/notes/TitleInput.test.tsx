@@ -53,11 +53,21 @@ describe('TitleInput', () => {
     expect(onSaveStart).toHaveBeenCalled()
   })
 
-  it('resets to new initialTitle when prop changes', () => {
+  it('does NOT reset to new initialTitle when prop changes for the same note', () => {
+    // Regression guard: a save round-trip updates the query cache and changes
+    // initialTitle for the *same* note. That must not clobber in-progress typing.
     const { rerender } = renderWithProviders(
       <TitleInput noteId="note-1" initialTitle="First" />
     )
     rerender(<TitleInput noteId="note-1" initialTitle="Second" />)
+    expect(screen.getByDisplayValue('First')).toBeInTheDocument()
+  })
+
+  it('resets to new initialTitle when switching to a different note', () => {
+    const { rerender } = renderWithProviders(
+      <TitleInput noteId="note-1" initialTitle="First" />
+    )
+    rerender(<TitleInput noteId="note-2" initialTitle="Second" />)
     expect(screen.getByDisplayValue('Second')).toBeInTheDocument()
   })
 

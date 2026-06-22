@@ -13,10 +13,18 @@ export function TitleInput({ noteId, initialTitle, onSaveStart, onSaveEnd, onSav
   const [value, setValue] = useState(initialTitle)
   const updateNote = useUpdateNote(noteId)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const loadedNoteIdRef = useRef(noteId)
 
+  // Only resync from the server value when switching notes — not on every cache
+  // update from our own save, which would otherwise overwrite in-progress typing
+  // with the stale snapshot and snap the cursor to the end.
   useEffect(() => {
-    setValue(initialTitle)
-  }, [initialTitle])
+    if (loadedNoteIdRef.current !== noteId) {
+      loadedNoteIdRef.current = noteId
+      setValue(initialTitle)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteId])
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

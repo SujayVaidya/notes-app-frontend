@@ -62,7 +62,10 @@ export function CategoryItem({ category, notes = [], onNavigate }: Props) {
   function handleNoteClick(note: Note) {
     setActiveNote(note._id)
     navigate(`/app/notes/${note._id}`)
-    onNavigate?.()
+    // Deferred so the Sheet's close doesn't race with the navigation/state
+    // update happening in the same click — on mobile this race can cause the
+    // sheet to dismiss before the tap is registered as "inside" its content.
+    setTimeout(() => onNavigate?.(), 0)
   }
 
   function handleRename() {

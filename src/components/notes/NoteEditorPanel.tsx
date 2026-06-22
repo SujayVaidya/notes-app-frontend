@@ -107,7 +107,7 @@ export function NoteEditorPanel() {
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-zinc-950">
       <NoteToolbar note={note} saveStatus={saveStatus} />
-      <div className="flex-1 flex flex-col min-h-0 px-6 pt-4 pb-6 md:ml-6">
+      <div className="flex-1 flex flex-col min-h-0 px-6 pt-4 pb-6 lg:ml-6">
         <TitleInput
           noteId={note._id}
           initialTitle={note.title}

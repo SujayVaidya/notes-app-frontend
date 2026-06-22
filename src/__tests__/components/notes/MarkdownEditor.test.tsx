@@ -37,10 +37,20 @@ describe('MarkdownEditor', () => {
       expect(getEditor()).toHaveValue('# Title')
     })
 
-    it('resets displayed value when initialContent prop changes', async () => {
+    it('does NOT reset displayed value when initialContent changes for the same note', async () => {
+      // Regression guard: a save round-trip updates the query cache and changes
+      // initialContent for the *same* note. That must not clobber in-progress typing.
       const { rerender } = renderWithProviders(<MarkdownEditor noteId="n1" initialContent="First" />)
       await flushEffects()
       rerender(<MarkdownEditor noteId="n1" initialContent="Second" />)
+      await flushEffects()
+      expect(getEditor()).toHaveValue('First')
+    })
+
+    it('resets displayed value when switching to a different note', async () => {
+      const { rerender } = renderWithProviders(<MarkdownEditor noteId="n1" initialContent="First" />)
+      await flushEffects()
+      rerender(<MarkdownEditor noteId="n2" initialContent="Second" />)
       await flushEffects()
       expect(getEditor()).toHaveValue('Second')
     })
