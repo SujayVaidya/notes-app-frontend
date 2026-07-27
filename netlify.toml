@@ -2,6 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+# Redirect old domain to new domain
+[[redirects]]
+  from = "https://notes.sujayvaidya.co.in/*"
+  to = "https://tools.nukerc.com/:splat"
+  status = 301
+  force = true
+
+# React SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
