@@ -5,7 +5,7 @@
 # Redirect old domain to new domain
 [[redirects]]
   from = "https://notes.sujayvaidya.co.in/*"
-  to = "https://tools.nukerc.com/:splat"
+  to = "https://notes.nukerc.com/:splat"
   status = 301
   force = true
 
